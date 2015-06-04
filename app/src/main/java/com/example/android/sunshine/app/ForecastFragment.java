@@ -27,7 +27,6 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 
 /**
@@ -182,11 +181,13 @@ public class ForecastFragment extends Fragment {
 
         @Override
         protected void onPostExecute(String[] strings) {
-            forecastAdapter = new ArrayAdapter<String>(getActivity(),
-                    R.layout.list_item_forecast, R.id.list_item_forecast_textview, Arrays.asList(strings));
-
-            ListView listViewForecast = (ListView)getActivity().findViewById(R.id.listview_forecast);
-            listViewForecast.setAdapter(forecastAdapter);
+            if (strings != null) {
+                forecastAdapter.clear();
+                for (String dayForecastStr : strings) {
+                    // updates the ListView automatically
+                    forecastAdapter.add(dayForecastStr);
+                }
+            }
         }
 
         /* The date/time conversion code is going to be moved outside the asynctask later,
