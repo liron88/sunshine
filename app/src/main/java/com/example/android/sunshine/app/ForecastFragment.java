@@ -27,12 +27,15 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 
 /**
  * A placeholder fragment containing a simple view.
  */
 public class ForecastFragment extends Fragment {
+
+    private ArrayAdapter<String> forecastAdapter;
 
     public ForecastFragment() {
     }
@@ -78,7 +81,7 @@ public class ForecastFragment extends Fragment {
         weekForecast.add("Fri - Foggy - 70/46");
         weekForecast.add("Sat - Sunny - 76/68");
 
-        ArrayAdapter<String> forecastAdapter = new ArrayAdapter<String>(getActivity(),
+        forecastAdapter = new ArrayAdapter<String>(getActivity(),
                 R.layout.list_item_forecast, R.id.list_item_forecast_textview, weekForecast);
 
         ListView listViewForecast = (ListView)rootView.findViewById(R.id.listview_forecast);
@@ -181,9 +184,18 @@ public class ForecastFragment extends Fragment {
             return null;
         }
 
+        @Override
+        protected void onPostExecute(String[] strings) {
+            forecastAdapter = new ArrayAdapter<String>(getActivity(),
+                    R.layout.list_item_forecast, R.id.list_item_forecast_textview, Arrays.asList(strings));
+
+            ListView listViewForecast = (ListView)getActivity().findViewById(R.id.listview_forecast);
+            listViewForecast.setAdapter(forecastAdapter);
+        }
+
         /* The date/time conversion code is going to be moved outside the asynctask later,
-        * so for convenience we're breaking it out into its own method now.
-        */
+                * so for convenience we're breaking it out into its own method now.
+                */
         private String getReadableDateString(long time){
             // Because the API returns a unix timestamp (measured in seconds),
             // it must be converted to milliseconds in order to be converted to valid date.
@@ -274,6 +286,7 @@ public class ForecastFragment extends Fragment {
             }
 
             for (String s : resultStrs) {
+                // TODO: remove later
                 Log.v(LOG_TAG, "Forecast entry: " + s);
             }
             return resultStrs;
