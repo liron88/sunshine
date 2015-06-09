@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -11,8 +12,10 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -73,7 +76,7 @@ public class ForecastFragment extends Fragment {
                              Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
-        ArrayList<String> weekForecast = new ArrayList<String>();
+        final ArrayList<String> weekForecast = new ArrayList<String>();
         weekForecast.add("Today - Sunny - 88/63");
         weekForecast.add("Tomorrow - Foggy - 70/46");
         weekForecast.add("Weds - Cloudy - 72/63");
@@ -86,6 +89,17 @@ public class ForecastFragment extends Fragment {
 
         ListView listViewForecast = (ListView)rootView.findViewById(R.id.listview_forecast);
         listViewForecast.setAdapter(forecastAdapter);
+
+        listViewForecast.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Context context = getActivity();
+                CharSequence text = forecastAdapter.getItem(position);
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast.makeText(context, text, duration).show();
+            }
+        });
 
         return rootView;
     }
@@ -118,6 +132,7 @@ public class ForecastFragment extends Fragment {
                 // Possible parameters are avaiable at OWM's forecast API page, at
                 // http://openweathermap.org/API#forecast
                 Uri.Builder uri = Uri.parse("http://api.openweathermap.org/data/2.5/forecast/daily?").buildUpon();
+                // attach the postal code
                 uri.appendQueryParameter(QUERY_PARAMS, params[0]);
                 uri.appendQueryParameter(MODE_PARAMS, mode);
                 uri.appendQueryParameter(UNITS_PARAMS, units);
