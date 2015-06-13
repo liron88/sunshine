@@ -240,7 +240,7 @@ public class ForecastFragment extends Fragment {
         }*/
         private String getReadableDateString(Calendar calendar){
             // returns the day of the week
-            return calendar.getDisplayName(calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
+            return calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.SHORT, Locale.getDefault());
         }
 
 
