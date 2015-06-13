@@ -2,6 +2,9 @@ package com.example.android.sunshine.app;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
@@ -38,7 +41,32 @@ public class MainActivity extends ActionBarActivity {
             startActivity(settingsIntent);
             return true;
         }
+        if (id == R.id.action_map) {
+            showMap();
+            return true;
+        }
 
         return super.onOptionsItemSelected(item);
     }
+
+    private void showMap() {
+        final String QUERY_PARAMS = "q";
+
+        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+        String locationValue = sharedPref.getString(getString(R.string.pref_location_key),
+                getString(R.string.pref_location_default));
+
+        // Construct a URI for location on map
+        Uri.Builder uri = Uri.parse("geo:0,0?").buildUpon();
+        // attach the address
+        uri.appendQueryParameter(QUERY_PARAMS, locationValue);
+
+        // implicit intent to launch map app
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(uri.build());
+        if (intent.resolveActivity(getPackageManager()) != null) {
+            startActivity(intent);
+        }
+    }
+
 }
