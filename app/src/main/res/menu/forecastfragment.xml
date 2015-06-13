@@ -6,4 +6,5 @@
         android:title="@string/action_refresh"
         android:orderInCategory="99"
         app:showAsAction="never" />
+
 </menu>
