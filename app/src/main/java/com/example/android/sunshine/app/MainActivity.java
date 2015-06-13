@@ -4,14 +4,17 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
+import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 
 public class MainActivity extends ActionBarActivity {
+
+    private final String LOG_TAG = MainActivity.class.getSimpleName();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +69,8 @@ public class MainActivity extends ActionBarActivity {
         intent.setData(uri.build());
         if (intent.resolveActivity(getPackageManager()) != null) {
             startActivity(intent);
+        } else {
+            Log.d(LOG_TAG, "Couldn't call " + locationValue + ", no receiving apps installed!");
         }
     }
 
