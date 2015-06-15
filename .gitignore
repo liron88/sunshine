@@ -1,3 +1,5 @@
+.DS_Store
+
 # Built application files
 *.apk
 *.ap_
@@ -26,9 +28,7 @@ proguard/
 *.log
 
 # Idea files
-/.idea/workspace.xml
-/.idea/libraries
-
-# Others
-.DS_Store
-/captures
+/.idea/
+*.iml
+*.ipr
+*.iws
