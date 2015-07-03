@@ -262,6 +262,8 @@ public class WeatherProvider extends ContentProvider {
         final int match = sUriMatcher.match(uri);
         int rowsDeleted = 0;
 
+        // this makes delete all rows return the number of rows deleted
+        if (selection == null) selection = "1";
         // Student: Use the uriMatcher to match the WEATHER and LOCATION URI's we are going to
         // handle.  If it doesn't match these, throw an UnsupportedOperationException.
         switch (match) {
@@ -289,7 +291,7 @@ public class WeatherProvider extends ContentProvider {
         // the uri listeners (using the content resolver) if the rowsDeleted != 0 or the selection
         // is null.
         // Oh, and you should notify the listeners here.
-        if (rowsDeleted != 0 || selection == null) {
+        if (rowsDeleted != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
@@ -337,7 +339,7 @@ public class WeatherProvider extends ContentProvider {
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
-        if (rowsUpdated != 0 || selection == null) {
+        if (rowsUpdated != 0) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
 
