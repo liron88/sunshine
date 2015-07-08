@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
@@ -118,24 +120,28 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         ListView listViewForecast = (ListView)rootView.findViewById(R.id.listview_forecast);
         listViewForecast.setAdapter(mForecastAdapter);
 
-//        listViewForecast.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//            @Override
-//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                Context context = getActivity();
-//                /*CharSequence text = mForecastAdapter.getItem(position);
-//                int duration = Toast.LENGTH_SHORT;
-//                Toast.makeText(context, text, duration).show();*/
-//
-//                String text = mForecastAdapter.getItem(position);
-//                Intent detailIntent = new Intent(context, DetailActivity.class);
-//                detailIntent.putExtra(Intent.EXTRA_TEXT, text);
-//                startActivity(detailIntent);
-//            }
-//        });
+        listViewForecast.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+
+            @Override
+            public void onItemClick(AdapterView adapterView, View view, int position, long l) {
+                // CursorAdapter returns a cursor at the correct position for getItem(), or null
+                // if it cannot seek to that position.
+                Cursor cursor = (Cursor)adapterView.getItemAtPosition(position);
+                if (cursor != null) {
+                    String locationSetting = Utility.getPreferredLocation(getActivity());
+                    Intent intent = new Intent(getActivity(), DetailActivity.class)
+                            .setData(WeatherContract.WeatherEntry.buildWeatherLocationWithDate(
+                                    locationSetting, cursor.getLong(COL_WEATHER_DATE)
+                            ));
+                    startActivity(intent);
+                }
+            }
+        });
 
         return rootView;
     }
 
+    @Override
     public Loader<Cursor> onCreateLoader(int i, Bundle bundle) {
 
         String locationSetting = Utility.getPreferredLocation(getActivity());
@@ -155,12 +161,14 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         );
     }
 
+    @Override
     public void onLoadFinished(Loader<Cursor> cursorLoader, Cursor cursor) {
         // Swap the new cursor in.  (The framework will take care of closing the
         // old cursor once we return.)
         mForecastAdapter.swapCursor(cursor);
     }
 
+    @Override
     public void onLoaderReset(Loader<Cursor> loader) {
         // This is called when the last Cursor provided to onLoadFinished()
         // above is about to be closed.  We need to make sure we are no
