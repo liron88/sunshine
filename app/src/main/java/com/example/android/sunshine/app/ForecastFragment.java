@@ -93,6 +93,19 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         return super.onOptionsItemSelected(item);
     }
 
+    @Override
+    public void onActivityCreated(Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+
+        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
+    }
+
+    // since we read the location when we create the loader, all we need to do is restart things
+    void onLocationChanged( ) {
+        updateWeather();
+        getLoaderManager().restartLoader(FORECAST_LOADER, null, this);
+    }
+
     private void updateWeather() {
 //        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
 //        String locationValue = sharedPref.getString(getString(R.string.pref_location_key),
@@ -101,12 +114,6 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
         String location = Utility.getPreferredLocation(getActivity());
         weatherTask.execute(location);
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-        updateWeather();
     }
 
     @Override
@@ -175,13 +182,5 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         // longer using it.
         mForecastAdapter.swapCursor(null);
     }
-
-    @Override
-    public void onActivityCreated(Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-
-        getLoaderManager().initLoader(FORECAST_LOADER, null, this);
-    }
-
 
 }
