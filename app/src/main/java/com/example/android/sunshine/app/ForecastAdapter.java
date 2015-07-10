@@ -65,9 +65,14 @@ public class ForecastAdapter extends CursorAdapter {
         ImageView iconView = (ImageView) view.findViewById(R.id.list_item_icon);
         iconView.setImageResource(R.drawable.ic_launcher);
 
-        // TODO Read date from cursor
+        long date = cursor.getLong(ForecastFragment.COL_WEATHER_DATE);
+        TextView dateView = (TextView)view.findViewById(R.id.list_item_date_textview);
+        String friendlyDate = Utility.getFriendlyDayString(context, date);
+        dateView.setText(friendlyDate);
 
-        // TODO Read weather forecast from cursor
+        String forecast = cursor.getString(ForecastFragment.COL_WEATHER_DESC);
+        TextView forecastView = (TextView)view.findViewById(R.id.list_item_forecast_textview);
+        forecastView.setText(forecast);
 
         // Read user preference for metric or imperial temperature units
         boolean isMetric = Utility.isMetric(context);
@@ -77,6 +82,8 @@ public class ForecastAdapter extends CursorAdapter {
         TextView highView = (TextView) view.findViewById(R.id.list_item_high_textview);
         highView.setText(Utility.formatTemperature(high, isMetric));
 
-        // TODO Read low temperature from cursor
+        double low = cursor.getDouble(ForecastFragment.COL_WEATHER_MIN_TEMP);
+        TextView lowView = (TextView) view.findViewById(R.id.list_item_low_textview);
+        lowView.setText(Utility.formatTemperature(low, isMetric));
     }
 }
