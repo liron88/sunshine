@@ -10,7 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 
-public class MainActivity extends ActionBarActivity {
+public class MainActivity extends ActionBarActivity implements ForecastFragment.Callback {
 
     private static final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
@@ -47,6 +47,27 @@ public class MainActivity extends ActionBarActivity {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.main, menu);
         return true;
+    }
+
+    @Override
+    public void onItemSelected(Uri dateUri) {
+        if (dateUri == null) {
+            return;
+        }
+
+        // two-pane mode
+        if (mTwoPane) {
+            DetailFragment fragment = DetailFragment.newInstance(dateUri);
+            getSupportFragmentManager().beginTransaction()
+                    .replace(R.id.weather_detail_container, fragment, DETAILFRAGMENT_TAG)
+                    .commit();
+        }
+        // one-pane mode
+        else {
+            Intent intent = new Intent(this, DetailActivity.class).setData(dateUri);
+            startActivity(intent);
+        }
+
     }
 
     @Override
@@ -92,16 +113,18 @@ public class MainActivity extends ActionBarActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        String location = Utility.getPreferredLocation(this);
+        String location = Utility.getPreferredLocation( this );
         // update the location in our second pane using the fragment manager
         if (location != null && !location.equals(mLocation)) {
-            // the reason for this is that we don't want a new forecast fragment, but
-            // rather the existing one. By using ForecastFragment.* we can only access
-            // static variables and methods
             ForecastFragment ff = (ForecastFragment)getSupportFragmentManager()
                     .findFragmentById(R.id.fragment_forecast);
-            if ( ff != null ) {
+            if ( null != ff ) {
                 ff.onLocationChanged();
+            }
+            DetailFragment df = (DetailFragment)getSupportFragmentManager()
+                    .findFragmentByTag(DETAILFRAGMENT_TAG);
+            if ( null != df ) {
+                df.onLocationChanged(location);
             }
             mLocation = location;
         }

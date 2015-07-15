@@ -2,6 +2,7 @@ package com.example.android.sunshine.app;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
@@ -9,7 +10,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.view.MenuItemCompat;
 import android.support.v7.widget.ShareActionProvider;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -29,11 +29,13 @@ import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-
+    static final String DETAIL_URI = "URI";
     private static final int DETAIL_LOADER = 0;
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
+
     private ShareActionProvider mShareActionProvider;
     private String mForecast = null;
+    private Uri mUri = null;
 
     private static final String[] DETAIL_COLUMNS = {
             WeatherEntry.TABLE_NAME + "." + WeatherEntry._ID,
@@ -78,9 +80,31 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         setHasOptionsMenu(true);
     }
 
+    public static DetailFragment newInstance(Uri uri) {
+        DetailFragment f = new DetailFragment();
+
+        if (uri != null) {
+            Bundle args = new Bundle();
+            args.putParcelable(DETAIL_URI, uri);
+            f.setArguments(args);
+        }
+
+        return f;
+    }
+
+    public Uri getShownUri() {
+        if (getArguments() != null)
+            return getArguments().getParcelable(DETAIL_URI);
+        else {
+            return null;
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        mUri = getShownUri();
+
         View rootView = inflater.inflate(R.layout.fragment_detail, container, false);
         mIconView = (ImageView) rootView.findViewById(R.id.detail_icon);
         mDateView = (TextView) rootView.findViewById(R.id.detail_date_textview);
@@ -119,6 +143,17 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         return shareIntent;
     }
 
+    void onLocationChanged(String newLocation) {
+        // replace the uri, since the location has changed
+        Uri uri = mUri;
+        if (null != uri) {
+            long date = WeatherContract.WeatherEntry.getDateFromUri(uri);
+            Uri updatedUri = WeatherContract.WeatherEntry.buildWeatherLocationWithDate(newLocation, date);
+            mUri = updatedUri;
+            getLoaderManager().restartLoader(DETAIL_LOADER, null, this);
+        }
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -128,9 +163,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public Loader<Cursor> onCreateLoader(int id, Bundle args) {
-        Log.v(LOG_TAG, "In onCreateLoader");
-        Intent intent = getActivity().getIntent();
-        if (intent == null || intent.getData() == null) {
+        if (mUri == null) {
             return null;
         }
 
@@ -138,7 +171,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         // creating a Cursor for the data being displayed.
         return new CursorLoader(
                 getActivity(),
-                intent.getData(),
+                mUri,
                 DETAIL_COLUMNS,
                 null,
                 null,
