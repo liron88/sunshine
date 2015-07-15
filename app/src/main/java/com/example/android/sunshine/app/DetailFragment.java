@@ -29,7 +29,7 @@ import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
-    static final String DETAIL_URI = "URI";
+    private static final String DETAIL_URI = "URI";
     private static final int DETAIL_LOADER = 0;
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
 
