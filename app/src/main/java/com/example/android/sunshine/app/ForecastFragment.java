@@ -24,6 +24,8 @@ import com.example.android.sunshine.app.data.WeatherContract;
  */
 public class ForecastFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
     private ForecastAdapter mForecastAdapter;
+    private boolean mUseTodayLayout;
+
     private static final int FORECAST_LOADER = 0;
     private static final String SELECTED_KEY = "selected_position";
 
@@ -129,12 +131,20 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
         weatherTask.execute(location);
     }
 
+    public void setUseTodayLayout(boolean useTodayLayout) {
+        mUseTodayLayout = useTodayLayout;
+        if (mForecastAdapter != null) {
+            mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
+        }
+    }
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              final Bundle savedInstanceState) {
         // The ForecastAdapter will take data from a source and
         // use it to populate the ListView it's attached to.
         mForecastAdapter = new ForecastAdapter(getActivity(), null, 0);
+        mForecastAdapter.setUseTodayLayout(mUseTodayLayout);
 
         View rootView = inflater.inflate(R.layout.fragment_main, container, false);
 
