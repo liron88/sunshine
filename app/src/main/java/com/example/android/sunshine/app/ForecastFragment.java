@@ -1,5 +1,6 @@
 package com.example.android.sunshine.app;
 
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
@@ -17,6 +18,7 @@ import android.widget.AdapterView;
 import android.widget.ListView;
 
 import com.example.android.sunshine.app.data.WeatherContract;
+import com.example.android.sunshine.app.service.SunshineService;
 
 
 /**
@@ -126,9 +128,12 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
 //        String locationValue = sharedPref.getString(getString(R.string.pref_location_key),
 //                getString(R.string.pref_location_default));
 //        new FetchWeatherTask(getActivity(), mForecastAdapter).execute(locationValue);
-        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
+//        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
         String location = Utility.getPreferredLocation(getActivity());
-        weatherTask.execute(location);
+        Intent intent = new Intent(getActivity(), SunshineService.class);
+        intent.putExtra(Intent.EXTRA_TEXT, location);
+        getActivity().startService(intent);
+//        weatherTask.execute(location);
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {
