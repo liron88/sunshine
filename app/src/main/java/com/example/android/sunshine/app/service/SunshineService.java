@@ -1,8 +1,10 @@
 package com.example.android.sunshine.app.service;
 
 import android.app.IntentService;
+import android.content.BroadcastReceiver;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -27,6 +29,18 @@ public class SunshineService extends IntentService {
 
     private final String LOG_TAG = SunshineService.class.getSimpleName();
 
+    public static final String LOCATION_QUERY_EXTRA = "lqe";
+
+    public static class AlarmReceiver extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            Intent sendIntent = new Intent(context, SunshineService.class);
+            sendIntent.putExtra(SunshineService.LOCATION_QUERY_EXTRA,
+                    intent.getStringExtra(SunshineService.LOCATION_QUERY_EXTRA));
+            context.startService(sendIntent);
+        }
+    }
+
     public SunshineService() {
         super("SunshineService");
     }
@@ -37,7 +51,7 @@ public class SunshineService extends IntentService {
             return;
         }
 
-        String locationQuery = intent.getStringExtra(Intent.EXTRA_TEXT);
+        String locationQuery = intent.getStringExtra(LOCATION_QUERY_EXTRA);
         // If there's no zip code, there's nothing to look up.  Verify size of params.
 //        if (params.length == 0) {
 //            return;

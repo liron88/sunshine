@@ -1,9 +1,13 @@
 package com.example.android.sunshine.app;
 
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.CursorLoader;
@@ -124,16 +128,22 @@ public class ForecastFragment extends Fragment implements LoaderManager.LoaderCa
     }
 
     private void updateWeather() {
-//        SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        String locationValue = sharedPref.getString(getString(R.string.pref_location_key),
-//                getString(R.string.pref_location_default));
-//        new FetchWeatherTask(getActivity(), mForecastAdapter).execute(locationValue);
-//        FetchWeatherTask weatherTask = new FetchWeatherTask(getActivity());
-        String location = Utility.getPreferredLocation(getActivity());
-        Intent intent = new Intent(getActivity(), SunshineService.class);
-        intent.putExtra(Intent.EXTRA_TEXT, location);
-        getActivity().startService(intent);
-//        weatherTask.execute(location);
+        Intent alarmIntent = new Intent(getActivity(), SunshineService.AlarmReceiver.class);
+        alarmIntent.putExtra(SunshineService.LOCATION_QUERY_EXTRA,
+                Utility.getPreferredLocation(getActivity()));
+
+        //Wrap in a pending intent which only fires once.
+        PendingIntent pi = PendingIntent.getBroadcast(getActivity(),
+                0,
+                alarmIntent,
+                PendingIntent.FLAG_ONE_SHOT);
+
+        AlarmManager alarmMgr = (AlarmManager)getActivity().getSystemService(Context.ALARM_SERVICE);
+
+        //Set the AlarmManager to wake up the system.
+        alarmMgr.set(AlarmManager.ELAPSED_REALTIME_WAKEUP,
+                SystemClock.elapsedRealtime() + 5 * 1000,
+                pi);
     }
 
     public void setUseTodayLayout(boolean useTodayLayout) {
