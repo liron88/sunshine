@@ -449,8 +449,16 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
 
     private void notifyWeather() {
         Context context = getContext();
-        //checking the last update and notify if it' the first of the day
+
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+        boolean notify = prefs.getBoolean(context.getString(R.string.pref_notifications_key), true);
+
+        if (!notify) {
+            return;
+        }
+
+        //checking the last update and notify if it' the first of the day
+        prefs = PreferenceManager.getDefaultSharedPreferences(context);
         String lastNotificationKey = context.getString(R.string.pref_last_notification);
         long lastSync = prefs.getLong(lastNotificationKey, 0);
 
@@ -512,6 +520,5 @@ public class SunshineSyncAdapter extends AbstractThreadedSyncAdapter {
                 editor.commit();
             }
         }
-
     }
 }
