@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
@@ -95,30 +94,8 @@ public class MainActivity extends ActionBarActivity implements ForecastFragment.
             startActivity(settingsIntent);
             return true;
         }
-        if (id == R.id.action_map) {
-            openPreferredLocationInMap();
-            return true;
-        }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    private void openPreferredLocationInMap() {
-        String location = Utility.getPreferredLocation(this);
-
-        // Construct a URI for location on map
-        Uri.Builder uri = Uri.parse("geo:0,0?").buildUpon();
-        // attach the address
-        uri.appendQueryParameter("q", location);
-
-        // implicit intent to launch map app
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(uri.build());
-        if (intent.resolveActivity(getPackageManager()) != null) {
-            startActivity(intent);
-        } else {
-            Log.d(LOG_TAG, "Couldn't call " + location + ", no receiving apps installed!");
-        }
     }
 
     @Override
